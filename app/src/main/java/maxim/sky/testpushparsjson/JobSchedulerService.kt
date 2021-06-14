@@ -6,9 +6,11 @@ import android.util.Log
 import org.json.JSONObject
 import java.net.URL
 
+
 class JobSchedulerService: JobService() {
 
     private var jobCancelled: Boolean = false
+    private var activity = MainActivity()
 
     override fun onStartJob(params: JobParameters?): Boolean {
         Log.d("test","Job started")
@@ -19,12 +21,7 @@ class JobSchedulerService: JobService() {
 
     private fun doBackgroundWork(params: JobParameters?){
         Thread(Runnable {
-
-            for (i in 1..10) {
-                if (jobCancelled) {
-                    return@Runnable
-                }
-                Log.d("test", "Thread wisp $i")
+            while (!jobCancelled) {
                 getWebSite()
                 try {
                     Thread.sleep(1000)
@@ -34,8 +31,7 @@ class JobSchedulerService: JobService() {
             }
             Log.d("test","Job finished")
             jobFinished(params, false)
-        }).start()
-
+            }).start()
         }
 
 
@@ -49,7 +45,7 @@ class JobSchedulerService: JobService() {
         val url = "https://redfront.space/api/sand-box-get/"
 
         val apiResponse = URL(url).readText()
-        Log.d("test", apiResponse)
+//        Log.d("test", apiResponse)
         //работа с массивом
         val number = JSONObject(apiResponse).getString("number") //вытянуть значение по ключу
         Log.d("test", number.toString())
