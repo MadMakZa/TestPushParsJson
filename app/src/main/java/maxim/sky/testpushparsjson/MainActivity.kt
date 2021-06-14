@@ -49,7 +49,6 @@ class MainActivity : AppCompatActivity() {
 
         button.setOnClickListener {
 //            sendNotification()
-            Log.d("test","value in example: $exampleDescription");
             if (!flagBtn){
                 flagBtn = true
                 button.text = "OFF"
