@@ -16,7 +16,6 @@ import androidx.appcompat.app.AppCompatActivity
 class MainActivity : AppCompatActivity() {
 
     private val JOB_ID = 1
-
     private var flagBtn: Boolean = false
     private lateinit var button: Button
     lateinit var textView: TextView

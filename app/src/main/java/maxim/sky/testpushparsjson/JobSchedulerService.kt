@@ -12,8 +12,9 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import org.json.JSONObject
-import java.net.URL
+import com.google.gson.GsonBuilder
+import okhttp3.*
+import java.io.IOException
 
 
 class JobSchedulerService: JobService() {
@@ -34,12 +35,11 @@ class JobSchedulerService: JobService() {
         Thread(Runnable {
             while (!jobCancelled) {
                 getWebSite()
-                sendNotification()
-                try {
-                    Thread.sleep(1000*60) //запрос раз в минуту
-                } catch (e: InterruptedException) {
+                    try {
+                        Thread.sleep(1000*60) //запрос раз в минуту 1000*60
+                    } catch (e: InterruptedException) {
 
-                }
+                    }
             }
             Log.d("test","Job finished")
             jobFinished(params, false)
@@ -53,15 +53,32 @@ class JobSchedulerService: JobService() {
         return true
     }
     //запрос на сервер
-    private fun getWebSite(){
+    private fun getWebSite() {
         val url = "https://redfront.space/api/sand-box-get/"
 
-        val apiResponse = URL(url).readText()
-        //работа с массивом
-        val number = JSONObject(apiResponse).getString("number") //вытянуть значение по ключу
-        Log.d("test", number.toString())
-        currentNumber = number.toString()
+        val request = Request.Builder()
+            .url(url)
+            .build()
 
+        val client = OkHttpClient()
+        client.newCall(request).enqueue(object: Callback {
+            override fun onResponse(call: Call, response: Response) {
+                val body = response.body?.string()
+                Log.d("test","onResponse $body")
+
+                val gson = GsonBuilder().create()
+                val gsonData = gson.fromJson(body, GsonData::class.java)
+                currentNumber = gsonData.number
+                sendNotification()
+            }
+            override fun onFailure(call: Call, e: IOException) {
+                //error here
+                Log.d("test","Error request execute")
+                currentNumber = "Error Request"
+                sendNotification()
+            }
+
+        })
     }
 
     //notification
@@ -83,7 +100,7 @@ class JobSchedulerService: JobService() {
             PendingIntent.FLAG_UPDATE_CURRENT) as PendingIntent
 
         val builder = NotificationCompat.Builder(this, "1")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.restorehealth)
             .setContentTitle("Полученные данные:")
             .setContentText(currentNumber)
             .setContentIntent(pi)
@@ -98,3 +115,6 @@ class JobSchedulerService: JobService() {
     }
 
 }
+//макет Gson
+data class GsonData(val result: String, val number: String)
+
