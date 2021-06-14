@@ -51,9 +51,8 @@ class JobSchedulerService: JobService() {
         val apiResponse = URL(url).readText()
         Log.d("test", apiResponse)
         //работа с массивом
-//        val objectSandBox = JSONObject(apiResponse).getJSONArray("")
-
-
+        val number = JSONObject(apiResponse).getString("number") //вытянуть значение по ключу
+        Log.d("test", number.toString())
 
     }
 
