@@ -85,7 +85,7 @@ class JobSchedulerService: JobService() {
         val builder = NotificationCompat.Builder(this, "1")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("Полученные данные:")
-            .setContentText(currentNumber.toString())
+            .setContentText(currentNumber)
             .setContentIntent(pi)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setDefaults(NotificationCompat.DEFAULT_ALL)
