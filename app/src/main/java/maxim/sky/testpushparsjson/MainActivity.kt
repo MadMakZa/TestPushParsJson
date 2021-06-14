@@ -6,7 +6,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -25,6 +24,7 @@ class MainActivity : AppCompatActivity() {
 
         button = findViewById(R.id.btn_on_off)
         textView = findViewById(R.id.tv_text)
+        info()
 
         button.setOnClickListener {
             if (!flagBtn){
@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun info(){
-        textView.text = "Scheduler"
+        textView.text = "Request must be here"
     }
 
     private fun createObjectJobInfo(){
@@ -71,6 +71,8 @@ class MainActivity : AppCompatActivity() {
         scheduler.cancel(JOB_ID)
         Log.d("test","Job Cancelled");
     }
+
+
 
 
 
