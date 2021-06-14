@@ -1,7 +1,5 @@
 package maxim.sky.testpushparsjson
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
 import android.content.ComponentName
@@ -11,20 +9,14 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat
 
 
 class MainActivity : AppCompatActivity() {
 
     private val JOB_ID = 1
-    private val NOTIFICATION_ID = 120
-    private val CHANNEL_ID = "101"
-    var exampleTitle = "number is:"
-    var exampleDescription = "number"
 
     private var flagBtn: Boolean = false
     private lateinit var button: Button
@@ -39,13 +31,10 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-
-
     @RequiresApi(Build.VERSION_CODES.O)
     private fun init(){
         button = findViewById(R.id.btn_on_off)
         textView = findViewById(R.id.tv_text)
-        CreateNotificationChannel()
 
         button.setOnClickListener {
 //            sendNotification()
@@ -53,36 +42,14 @@ class MainActivity : AppCompatActivity() {
                 flagBtn = true
                 button.text = "OFF"
                 createObjectJobInfo()
+                Toast.makeText(this,"Scheduler is launch!", Toast.LENGTH_SHORT).show()
             }
             else if (flagBtn){
                 flagBtn = false
                 button.text = "ON"
                 cancelJob()
+                Toast.makeText(this,"Scheduler is stopped!", Toast.LENGTH_SHORT).show()
             }
-        }
-    }
-
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun CreateNotificationChannel(){
-        val name = "Notification title"
-        val descriptionText = "Notification description"
-        val importance = NotificationManager.IMPORTANCE_DEFAULT
-        val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
-            description = descriptionText
-        }
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(channel)
-    }
-    fun sendNotification(){
-        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle(exampleTitle)
-            .setContentText(exampleDescription)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-
-        with(NotificationManagerCompat.from(this)){
-            notify(NOTIFICATION_ID, builder.build())
         }
     }
 

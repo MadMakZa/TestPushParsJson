@@ -19,7 +19,7 @@ import java.net.URL
 class JobSchedulerService: JobService() {
 
     private var jobCancelled: Boolean = false
-    private var currentNumber = 0
+    private var currentNumber = "Error Request"
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onStartJob(params: JobParameters?): Boolean {
@@ -36,7 +36,7 @@ class JobSchedulerService: JobService() {
                 getWebSite()
                 sendNotification()
                 try {
-                    Thread.sleep(2000)
+                    Thread.sleep(1000*60) //запрос раз в минуту
                 } catch (e: InterruptedException) {
 
                 }
@@ -57,11 +57,10 @@ class JobSchedulerService: JobService() {
         val url = "https://redfront.space/api/sand-box-get/"
 
         val apiResponse = URL(url).readText()
-//        Log.d("test", apiResponse)
         //работа с массивом
         val number = JSONObject(apiResponse).getString("number") //вытянуть значение по ключу
         Log.d("test", number.toString())
-        currentNumber = number.toInt()
+        currentNumber = number.toString()
 
     }
 
@@ -97,6 +96,5 @@ class JobSchedulerService: JobService() {
         }
 
     }
-
 
 }
