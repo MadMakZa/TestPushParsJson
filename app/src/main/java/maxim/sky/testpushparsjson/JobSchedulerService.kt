@@ -61,15 +61,23 @@ class JobSchedulerService: JobService() {
             .build()
 
         val client = OkHttpClient()
+        val codeClient = client.newCall(request).execute().code
         client.newCall(request).enqueue(object: Callback {
             override fun onResponse(call: Call, response: Response) {
                 val body = response.body?.string()
                 Log.d("test","onResponse $body")
-
-                val gson = GsonBuilder().create()
-                val gsonData = gson.fromJson(body, GsonData::class.java)
-                currentNumber = gsonData.number
-                sendNotification()
+                Log.d("test","CodeResponse $codeClient")
+                if (response.isSuccessful) {
+                    val gson = GsonBuilder().create()
+                    val gsonData = gson.fromJson(body, GsonData::class.java)
+                    currentNumber = gsonData.number
+                    sendNotification()
+                }
+                else{
+                    Log.d("test","response not successful")
+                    currentNumber = "Error Request"
+                    sendNotification()
+                }
             }
             override fun onFailure(call: Call, e: IOException) {
                 //error here
@@ -79,6 +87,7 @@ class JobSchedulerService: JobService() {
             }
 
         })
+
     }
 
     //notification
