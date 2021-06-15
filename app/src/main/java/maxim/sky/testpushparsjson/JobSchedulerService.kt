@@ -1,5 +1,6 @@
 package maxim.sky.testpushparsjson
 
+
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -8,10 +9,10 @@ import android.app.job.JobService
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.SystemClock
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import com.google.gson.GsonBuilder
 import okhttp3.*
 import java.io.IOException
@@ -25,8 +26,9 @@ class JobSchedulerService: JobService() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onStartJob(params: JobParameters?): Boolean {
         Log.d("test","Job started")
-        doBackgroundWork(params)
         createNotificationChannel()
+        doBackgroundWork(params)
+
         return true
     }
 
@@ -35,11 +37,7 @@ class JobSchedulerService: JobService() {
         Thread(Runnable {
             while (!jobCancelled) {
                 getWebSite()
-                    try {
-                        Thread.sleep(1000*60) //запрос раз в минуту 1000*60
-                    } catch (e: InterruptedException) {
-
-                    }
+                SystemClock.sleep(1000*60)
             }
             Log.d("test","Job finished")
             jobFinished(params, false)
@@ -105,8 +103,10 @@ class JobSchedulerService: JobService() {
 
     private fun sendNotification(){
         Log.d("test","Notification sending")
-        val pi = PendingIntent.getActivity(this, 0, Intent(this, MainActivity::class.java),
+        val pi = PendingIntent.getBroadcast(this, 0, Intent(this, MainActivity::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT) as PendingIntent
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
 
         val builder = NotificationCompat.Builder(this, "1")
             .setSmallIcon(R.drawable.restorehealth)
@@ -117,9 +117,8 @@ class JobSchedulerService: JobService() {
             .setDefaults(NotificationCompat.DEFAULT_ALL)
             .setAutoCancel(true)
 
-        with(NotificationManagerCompat.from(this)){
-            notify(1, builder.build())
-        }
+            notificationManager.notify(1, builder.build())
+
 
     }
 

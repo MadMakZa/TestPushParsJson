@@ -5,11 +5,14 @@ import android.app.job.JobInfo
 import android.app.job.JobScheduler
 import android.content.ComponentName
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
+import android.os.SystemClock
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 
 
@@ -19,6 +22,8 @@ class MainActivity : AppCompatActivity() {
     private var flagBtn: Boolean = false
     private lateinit var button: Button
     lateinit var textView: TextView
+
+//    private var scheduler: JobScheduler? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,11 +41,11 @@ class MainActivity : AppCompatActivity() {
         textView = findViewById(R.id.tv_text)
 
         button.setOnClickListener {
-            if (!flagBtn){
+            if (!flagBtn) {
                 flagBtn = true
                 button.text = "OFF"
                 createObjectJobInfo()
-                Toast.makeText(this,"Scheduler is launch!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Scheduler is launch!", Toast.LENGTH_SHORT).show()
             }
             else if (flagBtn){
                 flagBtn = false
@@ -51,6 +56,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun createObjectJobInfo(){
         //builder
         val serviceName = ComponentName(this, JobSchedulerService::class.java)
@@ -58,7 +64,7 @@ class MainActivity : AppCompatActivity() {
             .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
             .setRequiresCharging(false)
             .setPersisted(true)
-            .setPeriodic(15*60*1000) //15 минут минимум
+            .setPeriodic(15*1000*60) //15 минут минимум
             .build()
 
         //task
