@@ -65,8 +65,10 @@ class MainActivity : AppCompatActivity() {
         val cn = ComponentName(this, JobSchedulerService::class.java)
         val jobInfo: JobInfo.Builder = JobInfo.Builder(JOB_ID,cn)
         val job = jobInfo
-                .setPeriodic(60 * 1000 * 60)
-                .setBackoffCriteria(TimeUnit.MINUTES.toMillis(1), JobInfo.BACKOFF_POLICY_LINEAR)
+//                .setPeriodic(60 * 1000 * 60)
+                .setMinimumLatency(TimeUnit.MILLISECONDS.toMillis(10)) //The minimum delay time to execute
+                .setOverrideDeadline(TimeUnit.MILLISECONDS.toMillis(15)) //Maximum delay time to execute
+                .setBackoffCriteria(TimeUnit.MILLISECONDS.toMillis(1000), JobInfo.BACKOFF_POLICY_LINEAR) //Linear retry scheme
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setRequiresDeviceIdle(false)
                 .setRequiresCharging(false)
