@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var button: Button
     lateinit var textView: TextView
 
-    private lateinit var jobScheduler: JobScheduler
+    private var jobScheduler: JobScheduler? = null
     private lateinit var jobInfo: JobInfo
 
 
@@ -61,23 +61,28 @@ class MainActivity : AppCompatActivity() {
 
     //непосредственно создание и запуск шедулера
     private fun scheduleJob(){
-        var cn = ComponentName(this, JobSchedulerService::class.java)
-        var builder: JobInfo.Builder = JobInfo.Builder(JOB_ID,cn)
-        jobInfo = builder.build()
         jobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-        jobScheduler.schedule(jobInfo)
-        builder
-            .setPeriodic(60*1000*60)
-            .setBackoffCriteria(TimeUnit.MINUTES.toMillis(1),JobInfo.BACKOFF_POLICY_LINEAR)
-            .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-            .setRequiresCharging(false)
-            .setPersisted(true)
-        Log.d("test","Job Scheduler created")
+        val cn = ComponentName(this, JobSchedulerService::class.java)
+        val jobInfo: JobInfo.Builder = JobInfo.Builder(JOB_ID,cn)
+        val job = jobInfo
+                .setPeriodic(15 * 1000 * 60)
+                .setBackoffCriteria(TimeUnit.MINUTES.toMillis(1), JobInfo.BACKOFF_POLICY_LINEAR)
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setRequiresDeviceIdle(false)
+                .setRequiresCharging(false)
+                .setPersisted(true)
+                .build()
+
+        if (jobScheduler != null) {
+            jobScheduler!!.schedule(job)
+
+            Log.d("test", "Job Scheduler created")
+        }
 
     }
     //выключить шедулер
     private fun cancelJob(){
-        jobScheduler.cancel(JOB_ID)
+        jobScheduler!!.cancel(JOB_ID)
         Log.d("test","Job Cancelled")
     }
 

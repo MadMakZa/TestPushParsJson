@@ -38,7 +38,7 @@ class JobSchedulerService: JobService() {
             if (!jobCancelled) {
                 getWebSite()
             }
-            jobFinished(params, true) //позволяет перезапускать шедулер
+            jobFinished(params, true) // true позволяет перезапускать шедулер
             Log.d("test","Job finished")
             }).start()
         }
@@ -61,22 +61,29 @@ class JobSchedulerService: JobService() {
         val codeClient = client.newCall(request).execute().code
         client.newCall(request).enqueue(object: Callback {
             override fun onResponse(call: Call, response: Response) {
+                val resp = response.body
                 val body = response.body?.string()
-                Log.d("test","onResponse $body")
-                Log.d("test","CodeResponse $codeClient")
-                if (response.isSuccessful) {
-                    val gson = GsonBuilder().create()
-                    val gsonData = gson.fromJson(body, GsonData::class.java)
-                    currentNumber = gsonData.number
-                    sendNotification()
+                try {
+                    Log.d("test", "onResponse $body")
+                    Log.d("test", "CodeResponse $codeClient")
+                    if (response.isSuccessful) {
+                        val gson = GsonBuilder().create()
+                        val gsonData = gson.fromJson(body, GsonData::class.java)
+                        currentNumber = gsonData.number
+                        sendNotification()
+
+                    } else {
+                        Log.d("test", "response not successful")
+                        currentNumber = "Error Request"
+                        sendNotification()
+                    }
+                }catch (e: Throwable) {
+                    println(e.message)
+                }finally {
+                    resp?.close()
+                    Log.d("test", "response body closed")
                 }
-                else{
-                    Log.d("test","response not successful")
-                    currentNumber = "Error Request"
-                    sendNotification()
-                }
-                response.body?.close()
-                Log.d("test","response body is closed")
+
             }
             override fun onFailure(call: Call, e: IOException) {
                 //error here
