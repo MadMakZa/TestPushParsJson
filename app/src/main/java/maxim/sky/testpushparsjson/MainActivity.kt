@@ -1,19 +1,18 @@
 package maxim.sky.testpushparsjson
 
-import android.annotation.SuppressLint
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
 import android.content.ComponentName
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import android.os.SystemClock
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import java.util.concurrent.TimeUnit
 
 
 class MainActivity : AppCompatActivity() {
@@ -23,9 +22,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var button: Button
     lateinit var textView: TextView
 
-//    private var scheduler: JobScheduler? = null
+    private lateinit var jobScheduler: JobScheduler
+    private lateinit var jobInfo: JobInfo
 
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -35,16 +36,18 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    @SuppressLint("SetTextI18n")
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun init(){
         button = findViewById(R.id.btn_on_off)
         textView = findViewById(R.id.tv_text)
+//        jobScheduler = applicationContext.getSystemService(jobScheduler::class.java) as JobScheduler
+
 
         button.setOnClickListener {
             if (!flagBtn) {
                 flagBtn = true
                 button.text = "OFF"
-                createObjectJobInfo()
+                scheduleJob()
                 Toast.makeText(this, "Scheduler is launch!", Toast.LENGTH_SHORT).show()
             }
             else if (flagBtn){
@@ -56,31 +59,26 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
-    private fun createObjectJobInfo(){
-        //builder
-        val serviceName = ComponentName(this, JobSchedulerService::class.java)
-        val jobInfo = JobInfo.Builder(JOB_ID, serviceName)
+    //непосредственно создание и запуск шедулера
+    private fun scheduleJob(){
+        var cn = ComponentName(this, JobSchedulerService::class.java)
+        var builder: JobInfo.Builder = JobInfo.Builder(JOB_ID,cn)
+        jobInfo = builder.build()
+        jobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+        jobScheduler.schedule(jobInfo)
+        builder
+            .setPeriodic(15*1000*60)
+            .setBackoffCriteria(TimeUnit.MINUTES.toMillis(1),JobInfo.BACKOFF_POLICY_LINEAR)
             .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
             .setRequiresCharging(false)
             .setPersisted(true)
-            .setPeriodic(15*1000*60) //15 минут минимум
-            .build()
+        Log.d("test","Job Scheduler created")
 
-        //task
-        val scheduler: JobScheduler = applicationContext.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-        val result = scheduler.schedule(jobInfo)
-        if (result == JobScheduler.RESULT_SUCCESS) {
-            Log.d("test","JOb Scheduled created");
-        } else {
-            Log.d("test","Job Scheduling fail");
-        }
     }
-
+    //выключить шедулер
     private fun cancelJob(){
-        val scheduler: JobScheduler = applicationContext.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-        scheduler.cancel(JOB_ID)
-        Log.d("test","Job Cancelled");
+        jobScheduler.cancel(JOB_ID)
+        Log.d("test","Job Cancelled")
     }
 
 }

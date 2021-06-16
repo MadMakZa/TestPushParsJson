@@ -35,12 +35,11 @@ class JobSchedulerService: JobService() {
 
     private fun doBackgroundWork(params: JobParameters?){
         Thread(Runnable {
-            while (!jobCancelled) {
+            if (!jobCancelled) {
                 getWebSite()
-                SystemClock.sleep(1000*60)
             }
+            jobFinished(params, true) //позволяет перезапускать шедулер
             Log.d("test","Job finished")
-            jobFinished(params, false)
             }).start()
         }
 
