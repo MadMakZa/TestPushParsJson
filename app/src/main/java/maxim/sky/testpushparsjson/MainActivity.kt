@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
         jobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
         jobScheduler.schedule(jobInfo)
         builder
-            .setPeriodic(15*1000*60)
+            .setPeriodic(60*1000*60)
             .setBackoffCriteria(TimeUnit.MINUTES.toMillis(1),JobInfo.BACKOFF_POLICY_LINEAR)
             .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
             .setRequiresCharging(false)

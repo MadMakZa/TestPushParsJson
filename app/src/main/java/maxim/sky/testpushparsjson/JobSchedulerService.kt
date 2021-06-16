@@ -26,8 +26,8 @@ class JobSchedulerService: JobService() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onStartJob(params: JobParameters?): Boolean {
         Log.d("test","Job started")
-        createNotificationChannel()
         doBackgroundWork(params)
+        createNotificationChannel()
 
         return true
     }
@@ -75,6 +75,8 @@ class JobSchedulerService: JobService() {
                     currentNumber = "Error Request"
                     sendNotification()
                 }
+                response.body?.close()
+                Log.d("test","response body is closed")
             }
             override fun onFailure(call: Call, e: IOException) {
                 //error here
