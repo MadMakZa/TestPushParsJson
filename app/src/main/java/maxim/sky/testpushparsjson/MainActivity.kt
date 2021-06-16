@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         val cn = ComponentName(this, JobSchedulerService::class.java)
         val jobInfo: JobInfo.Builder = JobInfo.Builder(JOB_ID,cn)
         val job = jobInfo
-                .setPeriodic(15 * 1000 * 60)
+                .setPeriodic(60 * 1000 * 60)
                 .setBackoffCriteria(TimeUnit.MINUTES.toMillis(1), JobInfo.BACKOFF_POLICY_LINEAR)
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setRequiresDeviceIdle(false)
